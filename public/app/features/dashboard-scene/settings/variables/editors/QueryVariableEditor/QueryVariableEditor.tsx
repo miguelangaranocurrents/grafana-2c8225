@@ -55,24 +55,25 @@ export function QueryVariableEditor({ variable, onRunQuery }: QueryVariableEdito
 
   const onRegExChange = (event: React.FormEvent<HTMLTextAreaElement>) => {
     variable.setState({ regex: event.currentTarget.value });
-    onRunQuery();
   };
   const onRegexApplyToChange = (event: VariableRegexApplyTo) => {
     variable.setState({ regexApplyTo: event });
-    onRunQuery();
   };
   const onSortChange = (sort: SelectableValue<VariableSort>) => {
     variable.setState({ sort: sort.value });
-    onRunQuery();
   };
   const onRefreshChange = (refresh: VariableRefresh) => {
     variable.setState({ refresh: refresh });
   };
+  // Selection options change which options and value the variable ends up with, so refresh
+  // the options (and with them the preview) using the current query settings
   const onMultiChange = (event: FormEvent<HTMLInputElement>) => {
     variable.setState({ isMulti: event.currentTarget.checked });
+    onRunQuery();
   };
   const onIncludeAllChange = (event: FormEvent<HTMLInputElement>) => {
     variable.setState({ includeAll: event.currentTarget.checked });
+    onRunQuery();
   };
   const onAllValueChange = (event: FormEvent<HTMLInputElement>) => {
     variable.setState({ allValue: event.currentTarget.value });

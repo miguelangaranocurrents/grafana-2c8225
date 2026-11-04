@@ -12,7 +12,7 @@ import { getXAxisConfig, preparePlotConfigBuilder } from './utils';
 // deprecated LegendDisplayMode.Hidden
 const HIDDEN_LEGEND_DISPLAY_MODE = 'hidden';
 
-const propsToDiff:Array<string | PropDiffFn> = ['legend', 'options', 'annotationLanes', 'theme'];
+const propsToDiff: Array<string | PropDiffFn> = ['legend', 'options', 'annotationLanes', 'theme'];
 
 type TimeSeriesProps = Omit<GraphNGProps, 'prepConfig' | 'propsToDiff' | 'renderLegend' | 'theme' | 'legend'> & {
   legend: TimeSeriesLegendOptions;
