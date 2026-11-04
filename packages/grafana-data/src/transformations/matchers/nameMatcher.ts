@@ -1,6 +1,6 @@
 import { getFieldDisplayName } from '../../field/fieldState';
 import { stringToJsRegex } from '../../text/string';
-import { type DataFrame, type Field, FieldType, TIME_SERIES_VALUE_FIELD_NAME } from '../../types/dataFrame';
+import { type DataFrame, type Field, FieldType, TIME_SERIES_TIME_FIELD_NAME, TIME_SERIES_VALUE_FIELD_NAME } from '../../types/dataFrame';
 import { type FieldMatcher, type FieldMatcherInfo, type FrameMatcherInfo } from '../../types/transformations';
 
 import { FieldMatcherID, FrameMatcherID } from './ids';
@@ -114,7 +114,7 @@ function fieldNameFallback(fields: Set<string>) {
         field.labels?.__name__ === field.name
       );
     };
-  } else if (fields.has('Time') || fields.has('time')) {
+  } else if (fields.has(TIME_SERIES_TIME_FIELD_NAME)) {
     fallback = (field: Field, frame: DataFrame) => {
       return frame.meta?.typeVersion == null && field.type === FieldType.time;
     };

@@ -16,6 +16,9 @@ import {
   type Zone,
 } from './luxon';
 
+// zone name -> whether timezone data exists for it (see isKnownZoneName)
+const knownZoneNameCache = new Map<string, boolean>();
+
 export type MomentUnit =
   | 'years'
   | 'year'
@@ -752,13 +755,24 @@ class EasyTzZone extends IANAZone {
   }
 }
 
+function isKnownZoneName(name: string): boolean {
+  let known = knownZoneNameCache.get(name);
+  if (known === undefined) {
+    known = findTimeZoneAt(name, Date.now()) != null || IANAZone.isValidZone(name);
+    knownZoneNameCache.set(name, known);
+  }
+  return known;
+}
+
 function normalizeZone(zone: string | Zone): Zone {
   if (typeof zone !== 'string') {
     return zone;
   }
 
   const name = normalizeZoneName(zone);
-  if (name === 'UTC') {
+  // moment-timezone falls back to UTC for zones it has no data for (e.g. 'default'),
+  // an IANAZone with an unknown name would make every DateTime invalid instead.
+  if (name === 'UTC' || !isKnownZoneName(name)) {
     return FixedOffsetZone.instance(0);
   }
 
@@ -1030,6 +1044,12 @@ class MomentCompat implements MomentLike {
   tz(zone?: string, keepLocalTime = false): string | undefined | MomentLike {
     if (zone == null) {
       return this._dt.zoneName ?? undefined;
+    }
+
+    // like moment-timezone, switching to a zone without data leaves the moment unchanged
+    const name = normalizeZoneName(zone);
+    if (name !== 'UTC' && !isKnownZoneName(name)) {
+      return this;
     }
 
     return this._setDt(this._dt.setZone(normalizeZone(zone), { keepLocalTime }));
