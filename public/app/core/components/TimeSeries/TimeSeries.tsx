@@ -9,7 +9,10 @@ import { GraphNG, type GraphNGProps, type PropDiffFn } from '../GraphNG/GraphNG'
 
 import { getXAxisConfig, preparePlotConfigBuilder } from './utils';
 
-const propsToDiff: Array<string | PropDiffFn> = ['legend', 'options', 'annotationLanes', 'theme'];
+// deprecated LegendDisplayMode.Hidden
+const HIDDEN_LEGEND_DISPLAY_MODE = 'hidden';
+
+const propsToDiff:Array<string | PropDiffFn> = ['legend', 'options', 'annotationLanes', 'theme'];
 
 type TimeSeriesProps = Omit<GraphNGProps, 'prepConfig' | 'propsToDiff' | 'renderLegend' | 'theme' | 'legend'> & {
   legend: TimeSeriesLegendOptions;
@@ -41,7 +44,13 @@ export function TimeSeries(props: TimeSeriesProps) {
 
   const renderLegend = useCallback(
     (uPlotConfig: UPlotConfigBuilder) => {
-      if (!uPlotConfig || (legend && !legend.showLegend) || !hasVisibleLegendSeries(uPlotConfig, frames)) {
+      // `displayMode: hidden` is the deprecated way of hiding the legend: VizLegend renders nothing for it,
+      // and VizLayout would then wait forever for a legend height before rendering the plot.
+      if (
+        !uPlotConfig ||
+        (legend && (!legend.showLegend || String(legend.displayMode) === HIDDEN_LEGEND_DISPLAY_MODE)) ||
+        !hasVisibleLegendSeries(uPlotConfig, frames)
+      ) {
         return null;
       }
 
